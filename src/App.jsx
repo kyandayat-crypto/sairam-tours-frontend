@@ -2,7 +2,7 @@
 import { useState } from "react";
 import "./App.css";
 
-const API_URL = "http://localhost:5264/api";
+const API_URL = "https://sairam-tours-api.onrender.com/api";
 
 const fleet = [
   {
