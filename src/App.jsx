@@ -2,54 +2,36 @@
 import { useState } from "react";
 import "./App.css";
 import Admin from "./Pages/Admin";
+import Fleet from "./Fleet";
 
 const API_URL = "https://sairam-tours-api.onrender.com/api";
-
-const fleet = [
-  {
-    name: "Premium Sedan",
-    type: "Comfortable city travel",
-    seats: "4 Passengers",
-    image:
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    name: "Luxury SUV",
-    type: "Family and outstation trips",
-    seats: "6-7 Passengers",
-    image:
-      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    name: "Travel Van",
-    type: "Group and family journeys",
-    seats: "8+ Passengers",
-    image:
-      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=85",
-  },
-];
+const PHONE = "919096820758";
+const initialForm = {
+  customerName: "",
+  phone: "",
+  fromCity: "",
+  toCity: "",
+  journeyDate: "",
+  passengers: "2",
+  vehicleType: "Innova Crysta",
+};
 
 function App() {
   const [showAdmin, setShowAdmin] = useState(false);
-
-  const [form, setForm] = useState({
-    customerName: "",
-    phone: "",
-    fromCity: "",
-    toCity: "",
-    journeyDate: "",
-    passengers: "2",
-    vehicleType: "SUV",
-  });
-
+  const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
   function updateForm(event) {
-    setForm({
-      ...form,
+    setForm((previous) => ({
+      ...previous,
       [event.target.name]: event.target.value,
-    });
+    }));
+  }
+
+  function openWhatsApp(message) {
+    const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   async function submitBooking(event) {
@@ -60,9 +42,7 @@ function App() {
     try {
       const response = await fetch(`${API_URL}/bookings`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
           passengers: Number(form.passengers),
@@ -70,34 +50,41 @@ function App() {
         }),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(
-          result.message || "Booking submit zali nahi."
+          result.message || "Booking submit zali nahi. Please try again."
         );
       }
 
       const bookingId =
-        result.bookingId ?? result.id ?? "Not returned";
+        result.bookingId ?? result.id ?? "Pending confirmation";
 
-      setStatus(
-        `Booking successful! Your Booking ID: ${bookingId}`
-      );
+      setStatus(`Booking request successful! Booking ID: ${bookingId}`);
 
-      setForm({
-        customerName: "",
-        phone: "",
-        fromCity: "",
-        toCity: "",
-        journeyDate: "",
-        passengers: "2",
-        vehicleType: "SUV",
-      });
+      const message = [
+        "NEW BOOKING REQUEST - SAI MALHAR TOURS & TRAVELS",
+        "",
+        `Booking ID: ${bookingId}`,
+        `Customer: ${form.customerName}`,
+        `Phone: ${form.phone}`,
+        `Pickup: ${form.fromCity}`,
+        `Destination: ${form.toCity}`,
+        `Journey Date: ${form.journeyDate}`,
+        `Passengers: ${form.passengers}`,
+        `Vehicle: ${form.vehicleType}`,
+        "",
+        "Please confirm vehicle availability and fare.",
+      ].join("\n");
+
+      // Open WhatsApp with booking details after successful API response.
+      openWhatsApp(message);
+
+      setForm(initialForm);
     } catch (error) {
       setStatus(
-        error.message ||
-          "Server connect hot nahi. Backend check kara."
+        error.message || "Server connection failed. Please try again."
       );
     } finally {
       setLoading(false);
@@ -105,40 +92,20 @@ function App() {
   }
 
   const today = new Date();
-
   const minDate = [
     today.getFullYear(),
     String(today.getMonth() + 1).padStart(2, "0"),
     String(today.getDate()).padStart(2, "0"),
   ].join("-");
 
-  // Admin Panel
   if (showAdmin) {
     return (
       <div className="admin-page-wrapper">
-        <div
-          style={{
-            padding: "15px 5%",
-            background: "#102820",
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setShowAdmin(false)}
-            style={{
-              padding: "12px 20px",
-              border: "none",
-              borderRadius: "6px",
-              background: "#d7b46a",
-              color: "#102820",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
+        <div className="admin-backbar">
+          <button type="button" onClick={() => setShowAdmin(false)}>
             ← Back to Sai Malhar Website
           </button>
         </div>
-
         <Admin />
       </div>
     );
@@ -154,9 +121,10 @@ function App() {
       <header className="navbar">
         <a className="brand" href="#home">
           <span className="brand-mark">SM</span>
-          <span>
+          <span className="brand-contact">
             <strong>SAI MALHAR</strong>
             <small>TOURS &amp; TRAVELS</small>
+            <span className="brand-phone">9096820758</span>
           </span>
         </a>
 
@@ -168,48 +136,57 @@ function App() {
           <a href="#contact">Contact</a>
         </nav>
 
-        <a className="nav-cta" href="#booking">
-          BOOK YOUR RIDE <span>↗</span>
-        </a>
+        <div className="nav-actions">
+          <a
+            className="nav-whatsapp"
+            href={`https://wa.me/${PHONE}?text=${encodeURIComponent(
+              "Hello Sai Malhar Tours & Travels, I want to enquire about vehicle availability and fare."
+            )}`}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Contact us on WhatsApp"
+            title="Chat on WhatsApp"
+          >
+            <svg viewBox="0 0 32 32" width="26" height="26" fill="currentColor">
+              <path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.3a10.3 10.3 0 0 1-5.2-1.4l-.4-.2-3.9 1 1-3.8-.3-.4A10.3 10.3 0 1 1 16 26.3Zm5.7-7.7c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1a8.5 8.5 0 0 1-2.5-1.5 9.4 9.4 0 0 1-1.7-2.1c-.2-.4 0-.5.2-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6l-1-2.3c-.3-.6-.6-.5-.8-.5h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.8s1.2 3.2 1.4 3.4c.2.2 2.4 3.7 5.9 5.1.8.3 1.4.5 1.9.6.8.3 1.5.2 2.1.1.7-.1 1.8-.7 2-1.4.2-.7.2-1.3.1-1.4-.1-.1-.3-.2-.6-.4Z" />
+            </svg>
+          </a>
+
+          <a className="nav-cta" href="#booking">
+            BOOK YOUR RIDE <span>↗</span>
+          </a>
+        </div>
       </header>
 
       <main>
         <section className="hero" id="home">
-          <div className="hero-shade"></div>
-
+          <div className="hero-shade" />
           <div className="hero-content">
             <p className="eyebrow">
-              <span></span> TRAVEL IN COMFORT. ARRIVE IN STYLE.
+              <span /> TRAVEL IN COMFORT. ARRIVE IN STYLE.
             </p>
-
             <h1>
               YOUR JOURNEY.
               <br />
               <span>OUR PASSION.</span>
             </h1>
-
             <p className="hero-description">
-              Discover comfortable journeys, dependable service
-              and memorable road trips with Sai Malhar Tours &amp;
-              Travels.
+              Discover comfortable journeys, dependable service and
+              memorable road trips with Sai Malhar Tours &amp; Travels.
             </p>
-
             <div className="hero-actions">
               <a className="gold-button" href="#booking">
                 BOOK YOUR JOURNEY <span>↗</span>
               </a>
-
               <a className="outline-button" href="#fleet">
                 EXPLORE OUR FLEET
               </a>
             </div>
-
             <div className="hero-note">
-              <span className="note-line"></span>
+              <span className="note-line" />
               COMFORT · CARE · EVERY MILE
             </div>
           </div>
-
           <div className="hero-bottom">
             <span>PRIVATE TRANSFERS</span>
             <span>OUTSTATION TRIPS</span>
@@ -219,21 +196,12 @@ function App() {
 
         <section className="booking-strip" id="booking">
           <div className="section-intro">
-            <p className="eyebrow dark-eyebrow">
-              START YOUR JOURNEY
-            </p>
-
+            <p className="eyebrow dark-eyebrow">START YOUR JOURNEY</p>
             <h2>Reserve Your Ride</h2>
-
-            <p>
-              Share your travel details and send a booking request.
-            </p>
+            <p>Share your travel details and send a booking request.</p>
           </div>
 
-          <form
-            className="booking-form"
-            onSubmit={submitBooking}
-          >
+          <form className="booking-form" onSubmit={submitBooking}>
             <div className="form-grid">
               <label>
                 Full Name
@@ -253,7 +221,7 @@ function App() {
                   type="tel"
                   inputMode="numeric"
                   pattern="[0-9]{10}"
-                  maxLength="10"
+                  maxLength={10}
                   value={form.phone}
                   onChange={updateForm}
                   placeholder="10-digit mobile number"
@@ -305,8 +273,7 @@ function App() {
                   {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20].map(
                     (number) => (
                       <option key={number} value={number}>
-                        {number} passenger
-                        {number > 1 ? "s" : ""}
+                        {number} passenger{number > 1 ? "s" : ""}
                       </option>
                     )
                   )}
@@ -320,24 +287,19 @@ function App() {
                   value={form.vehicleType}
                   onChange={updateForm}
                 >
-                  <option value="Sedan">Premium Sedan</option>
-                  <option value="SUV">SUV / Family Car</option>
-                  <option value="Innova">Innova</option>
-                  <option value="Tempo Traveller">
-                    Tempo Traveller
-                  </option>
-                  <option value="Bus">Bus</option>
+                  <option value="Innova Crysta">Toyota Innova Crysta</option>
+                  <option value="Swift Dzire">Maruti Suzuki Swift Dzire</option>
+                  <option value="Ertiga">Maruti Suzuki Ertiga</option>
                 </select>
               </label>
             </div>
 
             <button
+              type="submit"
               className="gold-button submit-button"
               disabled={loading}
             >
-              {loading
-                ? "SENDING REQUEST..."
-                : "CONFIRM BOOKING REQUEST ↗"}
+              {loading ? "SENDING REQUEST..." : "CONFIRM BOOKING REQUEST ↗"}
             </button>
 
             {status && (
@@ -347,121 +309,55 @@ function App() {
             )}
 
             <p className="form-disclaimer">
-              Your request will be saved in our booking system.
-              Our team can confirm availability and fare separately.
+              Your request will be saved in our booking system. Our team
+              will confirm availability and fare separately.
             </p>
           </form>
         </section>
 
-        <section className="fleet-section" id="fleet">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow dark-eyebrow">
-                TRAVEL YOUR WAY
-              </p>
-              <h2>Explore Our Fleet</h2>
-            </div>
-
-            <p>
-              Choose the right ride for your next city transfer,
-              family outing or long-distance journey.
-            </p>
-          </div>
-
-          <div className="fleet-grid">
-            {fleet.map((vehicle) => (
-              <article className="fleet-card" key={vehicle.name}>
-                <div className="fleet-image">
-                  <img
-                    src={vehicle.image}
-                    alt={vehicle.name}
-                    loading="lazy"
-                  />
-
-                  <span className="fleet-tag">
-                    SAI MALHAR TRAVELS
-                  </span>
-                </div>
-
-                <div className="fleet-info">
-                  <div>
-                    <h3>{vehicle.name}</h3>
-                    <p>{vehicle.type}</p>
-                  </div>
-
-                  <span className="seat-count">
-                    {vehicle.seats}
-                  </span>
-
-                  <a href="#booking" className="fleet-link">
-                    ENQUIRE NOW <span>↗</span>
-                  </a>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+        <Fleet />
 
         <section className="journey-section" id="tours">
           <div className="journey-copy">
-            <p className="eyebrow">
-              MORE THAN JUST A RIDE
-            </p>
-
+            <p className="eyebrow">MORE THAN JUST A RIDE</p>
             <h2>
               Every mile,
-              <br />
-              a better memory.
+              <br />a better memory.
             </h2>
-
             <p>
-              Whether it is a family holiday, airport transfer,
-              business trip or weekend escape, plan your next
-              journey with Sai Malhar Tours &amp; Travels.
+              Whether it is a family holiday, airport transfer, business
+              trip or weekend escape, plan your next journey with Sai
+              Malhar Tours &amp; Travels.
             </p>
-
             <a className="gold-button" href="#booking">
               PLAN YOUR TRIP ↗
             </a>
           </div>
-
           <div
             className="journey-image"
             role="img"
             aria-label="Scenic road trip through the mountains"
-          ></div>
+          />
         </section>
 
         <section className="services-section">
-          <p className="eyebrow dark-eyebrow">
-            TRAVEL WITH CONFIDENCE
-          </p>
-
+          <p className="eyebrow dark-eyebrow">TRAVEL WITH CONFIDENCE</p>
           <h2>Made for Your Journey</h2>
-
           <div className="services-grid">
             <article>
               <span>01</span>
               <h3>Outstation Trips</h3>
-              <p>
-                Plan comfortable intercity and long-distance journeys.
-              </p>
+              <p>Plan comfortable intercity and long-distance journeys.</p>
             </article>
-
             <article>
               <span>02</span>
               <h3>Family Travel</h3>
-              <p>
-                Choose a vehicle to suit your group and travel needs.
-              </p>
+              <p>Choose a vehicle to suit your group and travel needs.</p>
             </article>
-
             <article>
               <span>03</span>
               <h3>Custom Tours</h3>
-              <p>
-                Share your route and schedule to request a tailored trip.
-              </p>
+              <p>Share your route and schedule to request a tailored trip.</p>
             </article>
           </div>
         </section>
@@ -472,17 +368,16 @@ function App() {
           <div className="footer-about">
             <a className="brand footer-brand" href="#home">
               <span className="brand-mark">SM</span>
-              <span>
+              <span className="brand-contact">
                 <strong>SAI MALHAR</strong>
                 <small>TOURS &amp; TRAVELS</small>
+                <span className="brand-phone">9096820758</span>
               </span>
             </a>
-
             <p>
-              Every journey begins with trust. Travel comfortably
-              with Sai Malhar Tours &amp; Travels.
+              Every journey begins with trust. Travel comfortably with
+              Sai Malhar Tours &amp; Travels.
             </p>
-
             <a className="footer-book-btn" href="#booking">
               Book Your Journey ↗
             </a>
@@ -491,7 +386,7 @@ function App() {
           <div className="footer-column">
             <h3>Quick Links</h3>
             <a href="#home">Home</a>
-            <a href="#about">About Us</a>
+            <a href="#tours">About Us</a>
             <a href="#fleet">Our Fleet</a>
             <a href="#tours">Tours &amp; Destinations</a>
             <a href="#booking">Book a Ride</a>
@@ -507,10 +402,9 @@ function App() {
 
           <div className="footer-column">
             <h3>Information</h3>
-            <a href="#about">About Our Company</a>
+            <a href="#tours">About Our Company</a>
             <a href="#contact">Contact Us</a>
             <a href="#booking">Booking Enquiry</a>
-
             <a
               href="#admin"
               onClick={(event) => {
@@ -526,15 +420,13 @@ function App() {
 
         <div className="footer-bottom">
           <p>
-            © {new Date().getFullYear()} Sai Malhar Tours &amp;
-            Travels. All rights reserved.
+            © {new Date().getFullYear()} Sai Malhar Tours &amp; Travels.
+            All rights reserved.
           </p>
-
           <div className="creator-info">
             <p>Created by: krushna_yandayat</p>
             <p>Mobile: 9096820758</p>
           </div>
-
           <a href="#home">Home ↑</a>
         </div>
       </footer>
@@ -543,3 +435,5 @@ function App() {
 }
 
 export default App;
+
+

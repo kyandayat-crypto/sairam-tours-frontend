@@ -1,0 +1,258 @@
+
+.fleet-section {
+  padding: 70px 5%;
+  background: #f7f8fa;
+  color: #18212f;
+  font-family: Arial, sans-serif;
+  scroll-margin-top: 25px;
+}
+
+.fleet-heading {
+  max-width: 760px;
+  margin: 0 auto 35px;
+  text-align: center;
+}
+
+.fleet-eyebrow {
+  color: #b7791f;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.fleet-heading h2 {
+  margin: 12px 0;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+}
+
+.fleet-heading p {
+  color: #667085;
+  line-height: 1.7;
+}
+
+.fleet-service-picker {
+  max-width: 480px;
+  margin: 0 auto 35px;
+}
+
+.fleet-service-picker label,
+.fleet-booking-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.fleet-service-picker select,
+.fleet-booking-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px;
+  border: 1px solid #d6dbe3;
+  border-radius: 9px;
+  background: #fff;
+  color: #18212f;
+  font-size: 15px;
+}
+
+.fleet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px;
+  max-width: 1250px;
+  margin: auto;
+  align-items: start;
+}
+
+.fleet-card {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e6e9ef;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(20, 35, 55, 0.07);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+
+.fleet-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 32px rgba(20, 35, 55, 0.12);
+}
+
+.fleet-card.selected {
+  border: 2px solid #b7791f;
+}
+
+.fleet-image-wrap {
+  position: relative;
+  height: 220px;
+  background: #e9edf2;
+}
+
+.fleet-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fleet-image-fallback {
+  display: none;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  place-items: center;
+  text-align: center;
+  color: #667085;
+  line-height: 1.7;
+}
+
+.fleet-seats {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: #fff;
+  color: #18212f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.fleet-card-content {
+  padding: 22px;
+}
+
+.fleet-card-content h3 {
+  margin: 0 0 8px;
+  font-size: 21px;
+}
+
+.fleet-car-type {
+  margin: 0 0 20px;
+  color: #667085;
+  font-size: 14px;
+}
+
+.fleet-rate-row,
+.fleet-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 0;
+  border-top: 1px solid #edf0f4;
+  font-size: 13px;
+}
+
+.fleet-rate-row strong,
+.fleet-total strong {
+  color: #176b43;
+  font-size: 21px;
+  white-space: nowrap;
+}
+
+.fleet-unavailable {
+  color: #8b5e24 !important;
+  font-size: 14px !important;
+}
+
+.fleet-note,
+.fleet-disclaimer {
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.fleet-select-button,
+.fleet-whatsapp-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px 15px;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+  transition: background 0.2s;
+}
+
+.fleet-select-button {
+  background: #182d49;
+  color: #fff;
+}
+
+.fleet-select-button:hover {
+  background: #27476f;
+}
+
+.fleet-select-button.active {
+  background: #176b43;
+}
+
+.fleet-select-button:disabled {
+  background: #c7cbd1;
+  cursor: not-allowed;
+}
+
+.fleet-booking-form {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #edf0f4;
+}
+
+.fleet-booking-form label {
+  margin-top: 14px;
+}
+
+.fleet-booking-form input {
+  margin-top: 8px;
+}
+
+.fleet-total {
+  margin-top: 15px;
+}
+
+.fleet-whatsapp-button {
+  background: #16864a;
+  color: white;
+}
+
+.fleet-whatsapp-button:hover {
+  background: #106b3a;
+}
+
+.fleet-disclaimer {
+  max-width: 900px;
+  margin: 28px auto 0;
+  text-align: center;
+}
+
+@media (max-width: 950px) {
+  .fleet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .fleet-section {
+    padding: 45px 16px;
+  }
+
+  .fleet-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .fleet-image-wrap {
+    height: 220px;
+  }
+
+  .fleet-card-content {
+    padding: 18px;
+  }
+}
